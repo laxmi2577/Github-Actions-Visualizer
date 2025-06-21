@@ -6,6 +6,7 @@ import sys
 import httpx
 import yaml
 import base64
+import uvicorn
 import itertools # We'll use this to help with the matrix combinations
 from fastapi import FastAPI, Header, HTTPException
 from starlette.responses import RedirectResponse, Response
@@ -175,8 +176,8 @@ async def get_job_logs(owner: str, repo_name: str, job_id: int, authorization: s
     return Response(content=response.text, media_type="text/plain")
 
 
-  if __name__ == "__main__":
-        import uvicorn
+if __name__ == "__main__":
+    
         # This will be used by Render to start the server.
         # It tells the server to be accessible from the internet ('0.0.0.0')
         # and to use the port specified by Render's PORT environment variable.
