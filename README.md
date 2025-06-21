@@ -120,7 +120,7 @@ To run this project on your local machine, follow these steps:
 | Repository List | Workflow List |
 | :---: | :---: |
 | ![Repository List Screenshot](docs/images/01-repo-list.png) | ![Workflow List Screenshot](docs/images/02-workflow-list.png) |
-| **Simple Graph View** | **Log Viewer Modal** |
+| **Simple View** | **Log Viewer Modal** |
 | ![Simple Graph Screenshot](docs/images/03-simple-view.png) | ![Log Viewer Screenshot](docs/images/04-log-modal.png) |
 
 ---
