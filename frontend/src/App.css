@@ -1,0 +1,157 @@
+/* File: frontend/src/App.css */
+
+body {
+  background-color: #1a202c;
+  color: #cbd5e0; 
+  font-family: sans-serif;
+  margin: 0;
+}
+
+.app-container {
+  min-height: 1vh;
+  display: grid;
+  place-items: center;
+  padding: 5rem;
+  box-sizing: border-box;
+}
+
+.content-card {
+  background-color: #2d3748;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  text-align: center;
+  width: 100%;
+  max-width: 600px;
+  transition: max-width 0.4s ease-in-out;
+}
+
+.content-card-wide {
+    max-width: 950px;
+}
+
+.app-title {
+  color: #63b3ed;
+}
+
+.app-footer {
+  position: fixed;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #4a5568;
+  font-size: 0.875rem;
+}
+
+.btn-github {
+  background-color: #333;
+  color: white;
+  font-weight: bold;
+  border: 1px solid #555;
+  transition: background-color 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.btn-github:hover {
+  background-color: #555;
+  color: white;
+}
+
+.item-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 1.5rem;
+  max-height: 50vh;
+  overflow-y: auto;
+  border: 1px solid #4a5568;
+  border-radius: 0.5rem;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  background-color: #1a202c;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #4a5568;
+  text-align: left;
+  transition: background-color 0.2s ease-in-out;
+  cursor: pointer;
+}
+.item:last-child { border-bottom: none; }
+.item:hover { background-color: #4a5568; }
+.item-icon { margin-right: 1rem; color: #4a5568; font-size: 1.25rem; flex-shrink: 0; }
+.item-content { display: flex; flex-direction: column; }
+.item-name { font-weight: bold; color: #63b3ed; }
+.item-empty { padding: 2rem; text-align: center; color: #718096; }
+
+.loader {
+  border: 4px solid #4a5568;
+  border-left-color: #63b3ed;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 2rem auto;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Custom Node Styles */
+.status-node {
+  padding: 10px 20px;
+  border-radius: 8px;
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+  border: 2px solid #718096;
+  background-color: #2d3748;
+  text-align: center;
+}
+
+.node-label { display: flex; align-items: center; justify-content: center; white-space: pre-wrap; }
+.node-label .node-icon { margin-right: 8px; font-size: 1.2em; flex-shrink: 0; }
+.node-success { background-color: #2f855a; border-color: #9ae6b4; }
+.node-failure, .node-cancelled, .node-timed_out { background-color: #c53030; border-color: #feb2b2; }
+.node-in_progress, .node-queued, .node-requested, .node-waiting, .node-pending { background-color: #dd6b20; border-color: #fbd38d; }
+.spinning { animation: spin 2s linear infinite; }
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(251, 211, 141, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(251, 211, 141, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(251, 211, 141, 0); }
+}
+
+
+/* --- List Item Icon Styles --- */
+.item .item-icon {
+  margin-right: 1rem;
+  color: #4a5568; /* Muted gray color */
+  font-size: 1.25rem;
+  flex-shrink: 0; /* Prevents the icon from shrinking */
+}
+
+.item .item-content {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Make the list item a flex container */
+.item {
+  display: flex;
+  align-items: center;
+}
+
+
+/* --- Node Icon Styles --- */
+.node-label .node-icon {
+  margin-right: 8px;
+  font-size: 1.2em;
+}
+
+/* Spinning animation for the loader icon */
+.spinning {
+  animation: spin 2s linear infinite;
+}
+
+/* We already have a @keyframes spin, so this will reuse it */

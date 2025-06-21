@@ -1,0 +1,18 @@
+# --- Environment ---
+# Ignore the Python virtual environment folder
+venv/
+*.venv
+
+# --- Secrets ---
+# Ignore the file containing secret keys
+.env
+
+# --- Python cache ---
+# Ignore compiled Python files and cache folders
+__pycache__/
+*.pyc
+
+# --- IDE/Editor specific files ---
+# Ignore settings from VS Code or other editors
+.vscode/
+.idea/
