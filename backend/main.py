@@ -1,5 +1,5 @@
 # File: backend/main.py
-# This version includes the logic to parse matrix strategy jobs.
+
 
 import os
 import sys
@@ -177,8 +177,4 @@ async def get_job_logs(owner: str, repo_name: str, job_id: int, authorization: s
 
 
 if __name__ == "__main__":
-    
-        # This will be used by Render to start the server.
-        # It tells the server to be accessible from the internet ('0.0.0.0')
-        # and to use the port specified by Render's PORT environment variable.
         uvicorn.run(app, host="0.0.0.0", port=int(os.environ.get("PORT", 8000)))

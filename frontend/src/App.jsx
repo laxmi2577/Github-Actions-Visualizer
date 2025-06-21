@@ -1,5 +1,4 @@
-/* File: frontend/src/App.jsx */
-// This is the complete, final, and fully-functional version of the main application component.
+
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import axios from 'axios';
@@ -8,6 +7,8 @@ import LogModal from './LogModal';
 import { FiBook, FiPlayCircle } from 'react-icons/fi'; 
 import './App.css'; 
 import './LogModal.css';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
 
 function App() {
   // --- STATE MANAGEMENT ---
@@ -51,7 +52,7 @@ function App() {
   useEffect(() => {
     if (selectedWorkflow) {
       updateJobStatuses(); 
-      pollIntervalRef.current = setInterval(updateJobStatuses, 60000); // Poll every 10 seconds
+      pollIntervalRef.current = setInterval(updateJobStatuses, 60000); // Poll every 1 minute
     }
     // Cleanup function to stop polling when the view changes
     return () => {
@@ -66,7 +67,7 @@ function App() {
   const updateJobStatuses = async () => {
     if (!selectedWorkflow || !selectedRepo) return;
     try {
-      const response = await axios.get(`http://127.0.0.1:8000/workflow-status/${selectedRepo.owner.login}/${selectedRepo.name}/${selectedWorkflow.id}`, {
+      const response = await axios.get(`${API_BASE_URL}/workflow-status/${selectedRepo.owner.login}/${selectedRepo.name}/${selectedWorkflow.id}`, {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       const statuses = response.data;
@@ -99,7 +100,7 @@ function App() {
     setJobLogs("");
 
     try {
-        const response = await axios.get(`http://127.0.0.1:8000/jobs/${selectedRepo.owner.login}/${selectedRepo.name}/${info.id}/logs`, {
+        const response = await axios.get(`${API_BASE_URL}/jobs/${selectedRepo.owner.login}/${selectedRepo.name}/${info.id}/logs`, {
             headers: { Authorization: `Bearer ${accessToken}` }
         });
         setJobLogs(response.data);
@@ -114,7 +115,7 @@ function App() {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await axios.get("http://127.0.0.1:8000/repositories", {
+      const response = await axios.get(`${API_BASE_URL}/repositories`, {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       setRepositories(response.data);
@@ -130,7 +131,7 @@ function App() {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await axios.get(`http://127.0.0.1:8000/repositories/${repo.owner.login}/${repo.name}/workflows`, {
+      const response = await axios.get(`${API_BASE_URL}/repositories/${repo.owner.login}/${repo.name}/workflows`, {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       setWorkflows(response.data);
@@ -147,7 +148,7 @@ function App() {
     setError(null);
     setGraphData({ nodes: [], edges: [] });
     try {
-      const response = await axios.get(`http://127.0.0.1:8000/parse-workflow`, {
+      const response = await axios.get(`${API_BASE_URL}/parse-workflow`, {
         params: { owner: selectedRepo.owner.login, repo_name: selectedRepo.name, workflow_path: workflow.path },
         headers: { Authorization: `Bearer ${accessToken}` },
       });
@@ -183,91 +184,88 @@ function App() {
     // 1. Not Logged In
     if (!accessToken) {
       return (
-        <div>
+        <div className="content-card">
           <p className="text-white-50 mb-4">Please log in with GitHub to continue.</p>
-          <a href="http://127.0.0.1:8000/login/github" className="btn btn-github btn-lg">
+          <a href={`${API_BASE_URL}/login/github`} className="btn btn-github btn-lg">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" className="bi bi-github me-2" viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8"/></svg>
             Login with GitHub
           </a>
         </div>
       );
     }
-    // 2. Viewing Graph
-    if (selectedWorkflow) { 
-      return ( 
-        <div>
-          <button className="btn btn-secondary mb-3" onClick={handleBack}>&larr; Back to Workflows</button>
-          <h4 className="text-white">Graph for <span className="text-info">{selectedWorkflow.name}</span></h4>
-          {isLoading && <div className="loader"></div>}
-          {error && <p className="text-danger mt-3">{error}</p>}
-          {!isLoading && !error && (
-            <GraphView 
-              initialNodes={graphData.nodes} 
-              initialEdges={graphData.edges}
-              onNodeClick={handleNodeClick}
-            />
-          )}
+    
+    const cardClassName = selectedWorkflow ? "content-card content-card-wide" : "content-card";
+
+    return (
+      <div className={cardClassName}>
+        <h1 className="app-title fw-bold fs-1 mb-2">CI/CD Pipeline Graph</h1>
+        <p className="text-secondary mb-4">A GitHub Actions Visualizer</p>
+        <hr className="text-secondary"/>
+        <div className="mt-4">
+          { selectedWorkflow ? ( 
+              <div>
+                <button className="btn btn-secondary mb-3" onClick={handleBack}>&larr; Back to Workflows</button>
+                <h4 className="text-white">Graph for <span className="text-info">{selectedWorkflow.name}</span></h4>
+                {isLoading && <div className="loader"></div>}
+                {error && <p className="text-danger mt-3">{error}</p>}
+                {!isLoading && !error && (
+                  <GraphView 
+                    initialNodes={graphData.nodes} 
+                    initialEdges={graphData.edges}
+                    onNodeClick={handleNodeClick}
+                  />
+                )}
+              </div>
+            ) : selectedRepo ? ( 
+              <div>
+                <button className="btn btn-secondary mb-3" onClick={handleBack}>&larr; Back to Repositories</button>
+                <h4 className="text-white">Workflows for <span className="text-info">{selectedRepo.name}</span></h4>
+                {isLoading && <div className="loader"></div>}
+                {error && <p className="text-danger mt-3">{error}</p>}
+                {!isLoading && !error && (
+                  <ul className="item-list">
+                    {workflows.length > 0 ? workflows.map(wf => (
+                      <li key={wf.id} className="item" onClick={() => handleSelectWorkflow(wf)}>
+                        <FiPlayCircle className="item-icon" />
+                        <div className="item-content">
+                          <div className="item-name">{wf.name}</div>
+                          <div className="text-secondary small">{wf.path}</div>
+                        </div>
+                      </li>
+                    )) : <li className="item-empty">No workflows found.</li>}
+                  </ul>
+                )}
+              </div>
+            ) : ( 
+              <div>
+                <p className="text-white-50">Select a repository to visualize its workflows.</p>
+                {isLoading && <div className="loader"></div>}
+                {error && <p className="text-danger mt-3">{error}</p>}
+                {!isLoading && !error && (
+                  <ul className="item-list">
+                    {repositories.map(repo => (
+                      <li key={repo.id} className="item" onClick={() => fetchWorkflows(repo)}>
+                        <FiBook className="item-icon" />
+                        <div className="item-content">
+                          <div className="item-name">{repo.name}</div>
+                          <div className="text-secondary small">{repo.full_name}</div>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <button className="btn btn-danger mt-4" onClick={handleLogout}>Logout</button>
+              </div>
+            )
+          }
         </div>
-      );
-    }
-    // 3. Viewing Workflows List
-    if (selectedRepo) { 
-      return ( 
-        <div>
-          <button className="btn btn-secondary mb-3" onClick={handleBack}>&larr; Back to Repositories</button>
-          <h4 className="text-white">Workflows for <span className="text-info">{selectedRepo.name}</span></h4>
-          {isLoading && <div className="loader"></div>}
-          {error && <p className="text-danger mt-3">{error}</p>}
-          {!isLoading && !error && (
-            <ul className="item-list">
-              {workflows.length > 0 ? workflows.map(wf => (
-                <li key={wf.id} className="item" onClick={() => handleSelectWorkflow(wf)}>
-                  <FiPlayCircle className="item-icon" />
-                  <div className="item-content">
-                    <div className="item-name">{wf.name}</div>
-                    <div className="text-secondary small">{wf.path}</div>
-                  </div>
-                </li>
-              )) : <li className="item-empty">No workflows found in this repository.</li>}
-            </ul>
-          )}
-        </div>
-      ); 
-    }
-    // 4. Viewing Repositories List
-    return ( 
-      <div>
-        <p className="text-white-50">Select a repository to visualize its workflows.</p>
-        {isLoading && <div className="loader"></div>}
-        {error && <p className="text-danger mt-3">{error}</p>}
-        {!isLoading && !error && (
-          <ul className="item-list">
-            {repositories.map(repo => (
-              <li key={repo.id} className="item" onClick={() => fetchWorkflows(repo)}>
-                <FiBook className="item-icon" />
-                <div className="item-content">
-                    <div className="item-name">{repo.name}</div>
-                    <div className="text-secondary small">{repo.full_name}</div>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-        <button className="btn btn-danger mt-4" onClick={handleLogout}>Logout</button>
       </div>
     );
   };
 
   return (
     <div className="app-container">
-      <div className="content-card p-4 p-md-5">
-        <h1 className="app-title fw-bold fs-1 mb-2">CI/CD Pipeline Graph</h1>
-        <p className="text-secondary mb-4">A GitHub Actions Visualizer</p>
-        <hr className="text-secondary"/>
-        <div className="mt-4">
-          {renderContent()}
-        </div>
-      </div>
+      {renderContent()}
       <LogModal 
         jobName={selectedJobName}
         logs={jobLogs}
